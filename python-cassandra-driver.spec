@@ -62,7 +62,7 @@ chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 # running (neither shipped with Fedora)
 %{__python2} setup.py nosetests --tests tests/unit/ \
 %ifnarch x86_64
-:
+|| :
 %endif
 
 
