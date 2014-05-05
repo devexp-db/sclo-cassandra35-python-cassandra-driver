@@ -60,7 +60,10 @@ chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 %check
 # Just running the unit tests. Integration tests need ccm and cassandra
 # running (neither shipped with Fedora)
-%{__python2} setup.py nosetests --tests tests/unit/
+%{__python2} setup.py nosetests --tests tests/unit/ \
+%ifnarch x86_64
+:
+%endif
 
 
 %files
