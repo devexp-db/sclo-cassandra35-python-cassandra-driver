@@ -3,7 +3,7 @@
 
 Name:           python-cassandra-driver
 Version:        1.1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        DataStax Python Driver for Apache Cassandra
 
 Group:          Development/Libraries
@@ -51,10 +51,10 @@ CFLAGS="%{optflags}" %{__python2} setup.py build
 %if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little"
 mkdir -p %{buildroot}%{python2_sitearch}
 mv %{buildroot}{%{python2_sitelib}/*,%{python2_sitearch}}
-%endif
-
+%else
 # ccache mock plugin can cause wrong mode to be set
 chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
+%endif
 
 
 %check
@@ -75,6 +75,9 @@ chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 
 
 %changelog
+* Wed May 07 2014 Lubomir Rintel (GoodData) <lubo.rintel@gooddata.com> - 1.1.1-3
+- No .so files on big endian platforms
+
 * Sat May 03 2014 Lubomir Rintel (GoodData) <lubo.rintel@gooddata.com> - 1.1.1-2
 - Make sure the .so files have correct mode
 - Fix license tag
