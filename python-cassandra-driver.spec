@@ -3,7 +3,7 @@
 
 Name:           python-cassandra-driver
 Version:        1.1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        DataStax Python Driver for Apache Cassandra
 
 Group:          Development/Libraries
@@ -75,6 +75,9 @@ chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Sat May 03 2014 Lubomir Rintel (GoodData) <lubo.rintel@gooddata.com> - 1.1.1-2
 - Make sure the .so files have correct mode
 - Fix license tag
