@@ -48,7 +48,7 @@ CFLAGS="%{optflags}" %{__python2} setup.py build
 # "The optional C extensions are not supported on big-endian systems."
 # ...which causes setup.py to install it into arch-agnostic directory,
 # which is not what we want, since we can't build a noarch package
-%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little" && %{__isa_bits} > 32
+%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little" && 0%{?__isa_bits} > 32
 mkdir -p %{buildroot}%{python2_sitearch}
 mv %{buildroot}{%{python2_sitelib}/*,%{python2_sitearch}}
 %endif
