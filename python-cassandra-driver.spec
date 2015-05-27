@@ -3,7 +3,7 @@
 
 Name:           python-cassandra-driver
 Version:        1.1.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        DataStax Python Driver for Apache Cassandra
 
 Group:          Development/Libraries
@@ -48,13 +48,15 @@ CFLAGS="%{optflags}" %{__python2} setup.py build
 # "The optional C extensions are not supported on big-endian systems."
 # ...which causes setup.py to install it into arch-agnostic directory,
 # which is not what we want, since we can't build a noarch package
-%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little"
+%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little" && %{__isa_bits} > 32
 mkdir -p %{buildroot}%{python2_sitearch}
 mv %{buildroot}{%{python2_sitelib}/*,%{python2_sitearch}}
 %endif
 
+%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little"
 # ccache mock plugin can cause wrong mode to be set
 chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
+%endif
 
 
 %check
@@ -75,6 +77,9 @@ chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 
 
 %changelog
+* Wed 27 May 2015 Lubomir Rintel <lkundrak@v3.sk> - 1.1.1-5
+- Fix build on 64-bit big-endians (Jakub Čajka, rh #1030563)
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
