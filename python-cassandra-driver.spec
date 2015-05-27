@@ -77,7 +77,7 @@ chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 
 
 %changelog
-* Wed 27 May 2015 Lubomir Rintel <lkundrak@v3.sk> - 1.1.1-5
+* Wed May 27 2015 Lubomir Rintel <lkundrak@v3.sk> - 1.1.1-5
 - Fix build on 64-bit big-endians (Jakub Čajka, rh #1030563)
 
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-4
