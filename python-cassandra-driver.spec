@@ -3,7 +3,7 @@
 
 Name:           python-cassandra-driver
 Version:        1.1.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        DataStax Python Driver for Apache Cassandra
 
 Group:          Development/Libraries
@@ -53,7 +53,7 @@ mkdir -p %{buildroot}%{python2_sitearch}
 mv %{buildroot}{%{python2_sitelib}/*,%{python2_sitearch}}
 %endif
 
-%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little"
+%if "%(%{__python2} -c 'import sys; print sys.byteorder')" == "little"
 # ccache mock plugin can cause wrong mode to be set
 chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 %endif
@@ -77,8 +77,11 @@ chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 
 
 %changelog
+* Wed May 27 2015 Lubomir Rintel <lkundrak@v3.sk> - 1.1.1-6
+- Fix up the previous patch
+
 * Wed May 27 2015 Lubomir Rintel <lkundrak@v3.sk> - 1.1.1-5
-- Fix build on 64-bit big-endians (Jakub Čajka, rh #1030563)
+- Fix build on 64-bit big-endians (Jakub Čajka, rh #1225487)
 
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
