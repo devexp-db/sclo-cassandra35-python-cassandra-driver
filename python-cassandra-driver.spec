@@ -3,7 +3,7 @@
 
 Name:           python-cassandra-driver
 Version:        1.1.1
-Release:        3%{?dist}
+Release:        6%{?dist}
 Summary:        DataStax Python Driver for Apache Cassandra
 
 Group:          Development/Libraries
@@ -48,10 +48,12 @@ CFLAGS="%{optflags}" %{__python2} setup.py build
 # "The optional C extensions are not supported on big-endian systems."
 # ...which causes setup.py to install it into arch-agnostic directory,
 # which is not what we want, since we can't build a noarch package
-%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little"
+%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little" && 0%{?__isa_bits} > 32
 mkdir -p %{buildroot}%{python2_sitearch}
 mv %{buildroot}{%{python2_sitelib}/*,%{python2_sitearch}}
-%else
+%endif
+
+%if "%(%{__python2} -c 'import sys; print sys.byteorder')" == "little"
 # ccache mock plugin can cause wrong mode to be set
 chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 %endif
@@ -75,8 +77,17 @@ chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
 
 
 %changelog
-* Wed May 07 2014 Lubomir Rintel (GoodData) <lubo.rintel@gooddata.com> - 1.1.1-3
-- No .so files on big endian platforms
+* Wed May 27 2015 Lubomir Rintel <lkundrak@v3.sk> - 1.1.1-6
+- Fix up the previous patch
+
+* Wed May 27 2015 Lubomir Rintel <lkundrak@v3.sk> - 1.1.1-5
+- Fix build on 64-bit big-endians (Jakub Čajka, rh #1225487)
+
+* Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
 * Sat May 03 2014 Lubomir Rintel (GoodData) <lubo.rintel@gooddata.com> - 1.1.1-2
 - Make sure the .so files have correct mode
