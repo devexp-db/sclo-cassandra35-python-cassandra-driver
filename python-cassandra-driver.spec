@@ -1,49 +1,84 @@
 %global __provides_exclude_from ^%{python2_sitearch}/cassandra/io/.*\\.so$
-%global commit 840064a9e27929c5f44ba06b72bfc3e69d905ee6
+%global __provides_exclude_from ^%{python3_sitearch}/cassandra/io/.*\\.so$
 
-Name:           python-cassandra-driver
-Version:        1.1.1
-Release:        9%{?dist}
-Summary:        DataStax Python Driver for Apache Cassandra
+%global srcname python-driver
+%global pypi_name cassandra-driver
+%global modname cassandra
+%global desc A modern, feature-rich and highly-tunable Python client library for\
+Apache Cassandra (1.2+) and DataStax Enterprise (3.1+) using exclusively\
+Cassandra's binary protocol and Cassandra Query Language v3.\
 
+Name:           python-%{pypi_name}
+Version:        3.6.0
+Release:        1%{?dist}
+Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
-License:        ASL 2.0 and MIT
-URL:            https://github.com/datastax/python-driver
-Source0:        https://github.com/datastax/python-driver/archive/%{commit}/python-driver-%{commit}.tar.gz
+License:        ASL 2.0
+URL:            https://github.com/datastax/%{srcname}
+Source0:        https://github.com/datastax/%{srcname}/archive/%{version}.tar.gz
 
-# Not upstreamable
-Patch0:         0001-Remove-unnecessary-test-dependencies.patch
-
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-BuildRequires:  python-futures
-BuildRequires:  python-scales
-BuildRequires:  python-blist
-BuildRequires:  python-nose
-BuildRequires:  python-mock
+BuildRequires:  libev
 BuildRequires:  libev-devel
 
+BuildRequires:  Cython
+BuildRequires:  python-futures
+BuildRequires:  python2-setuptools
+BuildRequires:  python2-devel
+BuildRequires:  python-scales
+BuildRequires:  python-blist
+BuildRequires:  python2-nose
+BuildRequires:  python2-mock
+BuildRequires:  python-sure
+
+BuildRequires:  python3-Cython
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-devel
+BuildRequires:  python3-scales
+BuildRequires:  python3-blist
+BuildRequires:  python3-nose
+BuildRequires:  python3-mock
+BuildRequires:  python3-sure
+
+%description
+%{desc}
+
+%package doc
+Summary:        Documentation for python-%{pypi_name}
+
+%description doc
+This package provides the documentation for python-%{pypi_name}.
+
+
+%package -n python2-%{pypi_name}
+Summary:        %{sumary}
+%{?python_provide:%python_provide python2-%{pypi_name}}
 Requires:       python-futures
 Requires:       python-scales
 Requires:       python-blist
 
-%description
-A Python client driver for Apache Cassandra. This driver works exclusively
-with the Cassandra Query Language v3 (CQL3) and Cassandra's native protocol.
-As such, only Cassandra 1.2+ is supported.
+%description -n python2-%{pypi_name}
+%{desc}
 
+
+%package -n python3-%{pypi_name}
+Summary:        %{sumary}
+%{?python_provide:%python_provide python3-%{pypi_name}}
+Requires:       python3-scales
+Requires:       python3-blist
+
+%description -n python3-%{pypi_name}
+%{desc}
 
 %prep
-%setup -q -n python-driver-%{commit}
-%patch0 -p1
-
+%setup -q -n %{srcname}-%{version}
 
 %build
-CFLAGS="%{optflags}" %{__python2} setup.py build
-
+%py2_build
+%py3_build
 
 %install
-%{__python2} setup.py install --skip-build --root %{buildroot}
+%py2_install
+%py3_install
 
 # "The optional C extensions are not supported on big-endian systems."
 # ...which causes setup.py to install it into arch-agnostic directory,
@@ -55,28 +90,57 @@ mv %{buildroot}{%{python2_sitelib}/*,%{python2_sitearch}}
 
 %if "%(%{__python2} -c 'import sys; print sys.byteorder')" == "little"
 # ccache mock plugin can cause wrong mode to be set
-chmod 0755 %{buildroot}%{python2_sitearch}/cassandra/{io/,}*.so
+chmod 0755 %{buildroot}%{python2_sitearch}/%{modname}/{io/,}*.so
 %endif
 
+%if "%(%{__python3} -c 'import sys; print(sys.byteorder)')" != "little" && 0%{?__isa_bits} > 32
+mkdir -p %{buildroot}%{python3_sitearch}
+mv %{buildroot}{%{python3_sitelib}/*,%{python3_sitearch}}
+%endif
+
+%if "%(%{__python3} -c 'import sys; print(sys.byteorder)')" == "little"
+# ccache mock plugin can cause wrong mode to be set
+chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
+%endif
 
 %check
 # Just running the unit tests. Integration tests need ccm and cassandra
 # running (neither shipped with Fedora)
-%{__python2} setup.py nosetests --tests tests/unit/ \
+%{__python2} -m nose tests/unit/ \
 %ifnarch x86_64
 || :
 %endif
 
+%{__python3} -m nose tests/unit/ \
+%ifnarch x86_64
+|| :
+%endif
 
-%files
-%{python2_sitearch}/cassandra/
-%exclude %{python2_sitearch}/cassandra/*.c
-%exclude %{python2_sitearch}/cassandra/*/*.c
-%{python2_sitearch}/cassandra*.egg-info/
-%doc CHANGELOG.rst README.rst LICENSE example.py
+%files doc
+%doc docs/
+%license LICENSE
 
+%files -n python2-%{pypi_name}
+%{python2_sitearch}/%{modname}/
+%exclude %{python2_sitearch}/%{modname}/*.c
+%exclude %{python2_sitearch}/%{modname}/*/*.c
+%{python2_sitearch}/%{modname}*.egg-info/
+%doc CHANGELOG.rst README.rst example_core.py example_mapper.py
+%license LICENSE
+
+%files -n python3-%{pypi_name}
+%{python3_sitearch}/%{modname}/
+%exclude %{python3_sitearch}/%{modname}/*.c
+%exclude %{python3_sitearch}/%{modname}/*/*.c
+%{python3_sitearch}/%{modname}*.egg-info/
+%doc CHANGELOG.rst README.rst example_core.py example_mapper.py
+%license LICENSE
 
 %changelog
+* Tue Aug 02 2016 Lumir Balhar <lbalhar@redhat.com> - 3.6.0-1
+- New upstream version
+- Python 2/3 subpackages
+
 * Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-9
 - https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
 
