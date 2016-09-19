@@ -9,7 +9,7 @@ Apache Cassandra (1.2+) and DataStax Enterprise (3.1+) using exclusively\
 Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
-Version:        3.6.0
+Version:        3.7.0
 Release:        1%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
@@ -29,6 +29,7 @@ BuildRequires:  python-blist
 BuildRequires:  python2-nose
 BuildRequires:  python2-mock
 BuildRequires:  python-sure
+BuildRequires:  python2-packaging
 
 BuildRequires:  python3-Cython
 BuildRequires:  python3-setuptools
@@ -38,6 +39,7 @@ BuildRequires:  python3-blist
 BuildRequires:  python3-nose
 BuildRequires:  python3-mock
 BuildRequires:  python3-sure
+BuildRequires:  python3-packaging
 
 %description
 %{desc}
@@ -137,6 +139,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %license LICENSE
 
 %changelog
+* Thu Sep 15 2016 Lumir Balhar <lbalhar@redhat.com> - 3.7.0-1
+- New upstream version
+
 * Tue Aug 02 2016 Lumir Balhar <lbalhar@redhat.com> - 3.6.0-1
 - New upstream version
 - Python 2/3 subpackages
