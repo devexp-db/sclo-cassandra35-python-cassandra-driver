@@ -1,6 +1,11 @@
 %global __provides_exclude_from ^%{python2_sitearch}/cassandra/io/.*\\.so$
 %global __provides_exclude_from ^%{python3_sitearch}/cassandra/io/.*\\.so$
 
+%ifnarch x86_64 i686 aarch64 armv7hl
+# disable debuginfo package on other platmorms
+%global debug_package %{nil}
+%endif
+
 %global srcname python-driver
 %global pypi_name cassandra-driver
 %global modname cassandra
@@ -10,7 +15,7 @@ Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
 Version:        3.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -82,22 +87,9 @@ Requires:       python3-blist
 %py2_install
 %py3_install
 
-# "The optional C extensions are not supported on big-endian systems."
-# ...which causes setup.py to install it into arch-agnostic directory,
-# which is not what we want, since we can't build a noarch package
-%if "%(%{__python2} -c 'import sys; print sys.byteorder')" != "little" && 0%{?__isa_bits} > 32
-mkdir -p %{buildroot}%{python2_sitearch}
-mv %{buildroot}{%{python2_sitelib}/*,%{python2_sitearch}}
-%endif
-
 %if "%(%{__python2} -c 'import sys; print sys.byteorder')" == "little"
 # ccache mock plugin can cause wrong mode to be set
 chmod 0755 %{buildroot}%{python2_sitearch}/%{modname}/{io/,}*.so
-%endif
-
-%if "%(%{__python3} -c 'import sys; print(sys.byteorder)')" != "little" && 0%{?__isa_bits} > 32
-mkdir -p %{buildroot}%{python3_sitearch}
-mv %{buildroot}{%{python3_sitelib}/*,%{python3_sitearch}}
 %endif
 
 %if "%(%{__python3} -c 'import sys; print(sys.byteorder)')" == "little"
@@ -139,6 +131,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %license LICENSE
 
 %changelog
+* Tue Oct 04 2016 Lumir Balhar <lbalhar@redhat.com> - 3.7.0-2
+- Removed workaround for big-endians platforms which is not necessary anymore
+
 * Thu Sep 15 2016 Lumir Balhar <lbalhar@redhat.com> - 3.7.0-1
 - New upstream version
 
