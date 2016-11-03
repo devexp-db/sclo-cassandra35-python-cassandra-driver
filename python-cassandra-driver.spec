@@ -14,8 +14,8 @@ Apache Cassandra (1.2+) and DataStax Enterprise (3.1+) using exclusively\
 Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
-Version:        3.7.0
-Release:        2%{?dist}
+Version:        3.7.1
+Release:        1%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -131,6 +131,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %license LICENSE
 
 %changelog
+* Wed Nov 02 2016 Lumír Balhar <lbalhar@redhat.com> - 3.7.1-1
+- New upstream version
+
 * Tue Oct 04 2016 Lumir Balhar <lbalhar@redhat.com> - 3.7.0-2
 - Removed workaround for big-endians platforms which is not necessary anymore
 
