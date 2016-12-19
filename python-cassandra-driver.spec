@@ -15,7 +15,7 @@ Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
 Version:        3.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -131,6 +131,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %license LICENSE
 
 %changelog
+* Mon Dec 19 2016 Miro Hrončok <mhroncok@redhat.com> - 3.7.1-2
+- Rebuild for Python 3.6
+
 * Wed Nov 02 2016 Lumír Balhar <lbalhar@redhat.com> - 3.7.1-1
 - New upstream version
 
