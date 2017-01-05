@@ -15,7 +15,7 @@ Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
 Version:        3.7.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -62,6 +62,9 @@ Summary:        %{summary}
 Requires:       python-futures
 Requires:       python-scales
 Requires:       python-blist
+
+Provides:       %{name} = %{version}-%{release}
+Obsoletes:      %{name} < 3.6.0-1
 
 %description -n python2-%{pypi_name}
 %{desc}
@@ -133,6 +136,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %license LICENSE
 
 %changelog
+* Wed Jan 04 2017 Lumír Balhar <lbalhar@redhat.com> - 3.7.1-4
+- Added Provides and Obsoletes to specfile
+
 * Mon Jan 02 2017 Lumír Balhar <lbalhar@redhat.com> - 3.7.1-3
 - Fixed typo in summary macro in specfile
 - Added hotfix for Cython version requirements
