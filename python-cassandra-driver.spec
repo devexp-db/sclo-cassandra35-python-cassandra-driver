@@ -14,8 +14,8 @@ Apache Cassandra (1.2+) and DataStax Enterprise (3.1+) using exclusively\
 Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
-Version:        3.7.1
-Release:        5%{?dist}
+Version:        3.8.0
+Release:        1%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -64,7 +64,7 @@ Requires:       python-scales
 Requires:       python-blist
 
 Provides:       %{name} = %{version}-%{release}
-Obsoletes:      %{name} < 3.6.0-1
+Obsoletes:      %{name} < 3.7.1-5
 
 %description -n python2-%{pypi_name}
 %{desc}
@@ -136,6 +136,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %license LICENSE
 
 %changelog
+* Thu Feb 23 2017 Lumír Balhar <lbalhar@redhat.com> - 3.8.0-1
+- New upstream release
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
