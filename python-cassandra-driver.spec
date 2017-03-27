@@ -1,5 +1,11 @@
+%if 0%{?fedora}
+%global with_python3 1
+%endif
+
 %global __provides_exclude_from ^%{python2_sitearch}/cassandra/io/.*\\.so$
+%if 0%{?with_python3}
 %global __provides_exclude_from ^%{python3_sitearch}/cassandra/io/.*\\.so$
+%endif
 
 %ifnarch x86_64 i686 aarch64 armv7hl
 # disable debuginfo package on other platmorms
@@ -15,7 +21,7 @@ Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
 Version:        3.8.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -27,24 +33,32 @@ BuildRequires:  libev-devel
 
 BuildRequires:  Cython
 BuildRequires:  python-futures
-BuildRequires:  python2-setuptools
 BuildRequires:  python2-devel
 BuildRequires:  python-scales
 BuildRequires:  python-blist
-BuildRequires:  python2-nose
 BuildRequires:  python2-mock
 BuildRequires:  python-sure
 BuildRequires:  python2-packaging
 
-BuildRequires:  python3-Cython
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-devel
-BuildRequires:  python3-scales
-BuildRequires:  python3-blist
-BuildRequires:  python3-nose
-BuildRequires:  python3-mock
-BuildRequires:  python3-sure
-BuildRequires:  python3-packaging
+%if 0%{?fedora}
+BuildRequires:  python2-setuptools
+BuildRequires:  python2-nose
+%else
+BuildRequires:  python-setuptools
+BuildRequires:  python-nose
+%endif
+
+%if 0%{?with_python3}
+BuildRequires:  python%{python3_pkgversion}-Cython
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-scales
+BuildRequires:  python%{python3_pkgversion}-blist
+BuildRequires:  python%{python3_pkgversion}-nose
+BuildRequires:  python%{python3_pkgversion}-mock
+BuildRequires:  python%{python3_pkgversion}-sure
+BuildRequires:  python%{python3_pkgversion}-packaging
+%endif
 
 %description
 %{desc}
@@ -69,37 +83,44 @@ Obsoletes:      %{name} < 3.7.1-5
 %description -n python2-%{pypi_name}
 %{desc}
 
-
-%package -n python3-%{pypi_name}
+%if 0%{?with_python3}
+%package -n python%{python3_pkgversion}-%{pypi_name}
 Summary:        %{summary}
-%{?python_provide:%python_provide python3-%{pypi_name}}
-Requires:       python3-scales
-Requires:       python3-blist
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+Requires:       python%{python3_pkgversion}-scales
+Requires:       python%{python3_pkgversion}-blist
 
-%description -n python3-%{pypi_name}
+%description -n python%{python3_pkgversion}-%{pypi_name}
 %{desc}
+%endif
 
 %prep
 %setup -q -n %{srcname}-%{version}
 # Fix Cython version requirements
-sed -i 's/\([cC]ython.*\),<0.25/\1/g' test-requirements.txt setup.py
+sed -i 's/\([cC]ython>=\).*,<0.25/\10.19/g' test-requirements.txt setup.py
 
 %build
 %py2_build
+%if 0%{?with_python3}
 %py3_build
+%endif
 
 %install
 %py2_install
+%if 0%{?with_python3}
 %py3_install
+%endif
 
 %if "%(%{__python2} -c 'import sys; print sys.byteorder')" == "little"
 # ccache mock plugin can cause wrong mode to be set
 chmod 0755 %{buildroot}%{python2_sitearch}/%{modname}/{io/,}*.so
 %endif
 
+%if 0%{?with_python3}
 %if "%(%{__python3} -c 'import sys; print(sys.byteorder)')" == "little"
 # ccache mock plugin can cause wrong mode to be set
 chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
+%endif
 %endif
 
 %check
@@ -110,9 +131,11 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 || :
 %endif
 
+%if 0%{?with_python3}
 %{__python3} -m nose tests/unit/ \
 %ifnarch x86_64
 || :
+%endif
 %endif
 
 %files doc
@@ -127,15 +150,20 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %doc CHANGELOG.rst README.rst example_core.py example_mapper.py
 %license LICENSE
 
-%files -n python3-%{pypi_name}
+%if 0%{?with_python3}
+%files -n python%{python3_pkgversion}-%{pypi_name}
 %{python3_sitearch}/%{modname}/
 %exclude %{python3_sitearch}/%{modname}/*.c
 %exclude %{python3_sitearch}/%{modname}/*/*.c
 %{python3_sitearch}/%{modname}*.egg-info/
 %doc CHANGELOG.rst README.rst example_core.py example_mapper.py
 %license LICENSE
+%endif
 
 %changelog
+* Mon Mar 27 2017 Lumír Balhar <lbalhar@redhat.com> - 3.8.1-2
+- Epel7 update
+
 * Fri Mar 17 2017 Lumír Balhar <lbalhar@redhat.com> - 3.8.1-1
 - New upstream release
 
