@@ -1,5 +1,6 @@
 %if 0%{?fedora}
 %global with_python3 1
+%global with_tests 1
 %endif
 
 %global __provides_exclude_from ^%{python2_sitearch}/cassandra/io/.*\\.so$
@@ -21,7 +22,7 @@ Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
 Version:        3.8.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -31,7 +32,6 @@ Source0:        https://github.com/datastax/%{srcname}/archive/%{version}.tar.gz
 BuildRequires:  libev
 BuildRequires:  libev-devel
 
-BuildRequires:  Cython
 BuildRequires:  python-futures
 BuildRequires:  python2-devel
 BuildRequires:  python-scales
@@ -41,6 +41,7 @@ BuildRequires:  python-sure
 BuildRequires:  python2-packaging
 
 %if 0%{?fedora}
+BuildRequires:  Cython
 BuildRequires:  python2-setuptools
 BuildRequires:  python2-nose
 %else
@@ -96,17 +97,27 @@ Requires:       python%{python3_pkgversion}-blist
 
 %prep
 %setup -q -n %{srcname}-%{version}
-# Fix Cython version requirements
-sed -i 's/\([cC]ython>=\).*,<0.25/\10.19/g' test-requirements.txt setup.py
+# Fix Cython version requirements (remove upper limit)
+sed -i 's/\([cC]ython.*\),<0.25/\1/g' test-requirements.txt setup.py
 
 %build
+# Build with Cython only in Fedora
+%if 0%{?fedora}
 %py2_build
+%else
+%py2_build -- --no-cython
+%endif
+
 %if 0%{?with_python3}
 %py3_build
 %endif
 
 %install
+%if 0%{?fedora}
 %py2_install
+%else
+%py2_install -- --no-cython
+%endif
 %if 0%{?with_python3}
 %py3_install
 %endif
@@ -126,6 +137,7 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %check
 # Just running the unit tests. Integration tests need ccm and cassandra
 # running (neither shipped with Fedora)
+%if 0%{?with_tests}
 %{__python2} -m nose tests/unit/ \
 %ifnarch x86_64
 || :
@@ -135,8 +147,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %{__python3} -m nose tests/unit/ \
 %ifnarch x86_64
 || :
-%endif
-%endif
+%endif # ifnarch
+%endif # with_python3
+%endif # with_tests
 
 %files doc
 %doc docs/
@@ -161,6 +174,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %endif
 
 %changelog
+* Wed Mar 29 2017 Lumír Balhar <lbalhar@redhat.com> - 3.8.1-3
+- Disable Cython integration and tests in Epel7
+
 * Mon Mar 27 2017 Lumír Balhar <lbalhar@redhat.com> - 3.8.1-2
 - Epel7 update
 
