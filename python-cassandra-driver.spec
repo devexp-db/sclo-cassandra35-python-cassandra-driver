@@ -21,8 +21,8 @@ Apache Cassandra (1.2+) and DataStax Enterprise (3.1+) using exclusively\
 Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
-Version:        3.8.1
-Release:        3%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -174,6 +174,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %endif
 
 %changelog
+* Sun Apr 16 2017 Lumír Balhar <lbalhar@redhat.com> - 3.9.0-1
+- New upstream release
+
 * Wed Mar 29 2017 Lumír Balhar <lbalhar@redhat.com> - 3.8.1-3
 - Disable Cython integration and tests in Epel7
 
