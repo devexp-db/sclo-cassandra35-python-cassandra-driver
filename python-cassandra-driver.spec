@@ -22,12 +22,15 @@ Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
 Version:        3.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
 URL:            https://github.com/datastax/%{srcname}
 Source0:        https://github.com/datastax/%{srcname}/archive/%{version}.tar.gz
+
+# Fix for tests on big endian platforms PR: https://github.com/datastax/python-driver/pull/762
+Patch1:         0001-Fix-tests-of-Murmur-hash-algorithm-on-big-endian-pla.patch
 
 BuildRequires:  libev
 BuildRequires:  libev-devel
@@ -96,7 +99,7 @@ Requires:       python%{python3_pkgversion}-blist
 %endif
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 # Fix Cython version requirements (remove upper limit)
 sed -i 's/\([cC]ython.*\),<0.25/\1/g' test-requirements.txt setup.py
 
@@ -139,13 +142,13 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 # running (neither shipped with Fedora)
 %if 0%{?with_tests}
 %{__python2} -m nose tests/unit/ \
-%ifnarch x86_64
+%ifarch s390x armv7hl
 || :
 %endif
 
 %if 0%{?with_python3}
 %{__python3} -m nose tests/unit/ \
-%ifnarch x86_64
+%ifarch s390x armv7hl
 || :
 %endif # ifnarch
 %endif # with_python3
@@ -174,6 +177,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %endif
 
 %changelog
+* Tue May 16 2017 Lumír Balhar <lbalhar@redhat.com> - 3.9.0-2
+- Fix and enable tests on more (big endian) platforms
+
 * Sun Apr 16 2017 Lumír Balhar <lbalhar@redhat.com> - 3.9.0-1
 - New upstream release
 
