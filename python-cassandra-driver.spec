@@ -21,8 +21,8 @@ Apache Cassandra (1.2+) and DataStax Enterprise (3.1+) using exclusively\
 Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
-Version:        3.9.0
-Release:        3%{?dist}
+Version:        3.10.0
+Release:        1%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -39,6 +39,7 @@ BuildRequires:  python-blist
 BuildRequires:  python2-mock
 BuildRequires:  python-sure
 BuildRequires:  python2-packaging
+BuildRequires: python2-eventlet
 
 %if 0%{?fedora}
 BuildRequires:  Cython
@@ -59,6 +60,7 @@ BuildRequires:  python%{python3_pkgversion}-nose
 BuildRequires:  python%{python3_pkgversion}-mock
 BuildRequires:  python%{python3_pkgversion}-sure
 BuildRequires:  python%{python3_pkgversion}-packaging
+BuildRequires:  python%{python3_pkgversion}-eventlet
 %endif
 
 %description
@@ -142,8 +144,11 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %ifarch ppc64
 -e test_murmur3_python
 %endif # ifarch
+%ifarch aarch64
+-e test_nts_token_performance
+%endif # ifarch
 %ifarch s390x
--e test_murmur3_python -e test_multi_timer_validation
+-e test_murmur3_python -e test_multi_timer_validation -e test_nts_token_performance
 %endif # ifarch
 
 %if 0%{?with_python3}
@@ -151,8 +156,11 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %ifarch ppc64
 -e test_murmur3_python
 %endif # ifarch
+%ifarch aarch64
+-e test_nts_token_performance
+%endif # ifarch
 %ifarch s390x
--e test_murmur3_python -e test_multi_timer_validation
+-e test_murmur3_python -e test_multi_timer_validation -e test_nts_token_performance
 %endif # ifarch
 %endif # with_python3
 %endif # with_tests
@@ -180,6 +188,10 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %endif
 
 %changelog
+* Fri May 26 2017 Lumír Balhar <lbalhar@redhat.com> - 3.10.0-1
+- New upstream release
+- Skip new test for specific platforms
+
 * Thu May 18 2017 Lumír Balhar <lbalhar@redhat.com> - 3.9.0-3
 - Skip only specific tests on centrain unsupported platforms
 
