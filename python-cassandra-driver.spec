@@ -22,7 +22,7 @@ Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           python-%{pypi_name}
 Version:        3.11.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -188,6 +188,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %endif
 
 %changelog
+* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
 * Mon Jul 31 2017 Lumír Balhar <lbalhar@redhat.com> - 3.11.0-1
 - New upstream version
 
