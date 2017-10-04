@@ -1,3 +1,6 @@
+%{?scl:%scl_package python-futures}
+%{!?scl:%global pkg_name %{name}}
+
 %if 0%{?fedora}
 %global with_python3 1
 %global with_tests 1
@@ -20,9 +23,9 @@
 Apache Cassandra (1.2+) and DataStax Enterprise (3.1+) using exclusively\
 Cassandra's binary protocol and Cassandra Query Language v3.\
 
-Name:           python-%{pypi_name}
+Name:           %{?scl_prefix}python-%{pypi_name}
 Version:        3.11.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -32,14 +35,14 @@ Source0:        https://github.com/datastax/%{srcname}/archive/%{version}.tar.gz
 BuildRequires:  libev
 BuildRequires:  libev-devel
 
-BuildRequires:  python-futures
+BuildRequires:  %{?scl_prefix}python2-futures
 BuildRequires:  python2-devel
-BuildRequires:  python-scales
-BuildRequires:  python-blist
-BuildRequires:  python2-mock
-BuildRequires:  python-sure
-BuildRequires:  python2-packaging
-BuildRequires: python2-eventlet
+BuildRequires:  %{?scl_prefix}python2-scales
+BuildRequires:  %{?scl_prefix}python2-blist
+#BuildRequires:  python2-mock
+BuildRequires:  %{?scl_prefix}python2-sure
+BuildRequires:  %{?scl_prefix}python2-packaging
+BuildRequires:  %{?scl_prefix}python2-eventlet
 
 %if 0%{?fedora}
 BuildRequires:  Cython
@@ -63,6 +66,9 @@ BuildRequires:  python%{python3_pkgversion}-packaging
 BuildRequires:  python%{python3_pkgversion}-eventlet
 %endif
 
+%{?scl:Requires: %scl_runtime}
+%{?scl:BuildRequires: %scl-scldevel}
+
 %description
 %{desc}
 
@@ -73,27 +79,27 @@ Summary:        Documentation for python-%{pypi_name}
 This package provides the documentation for python-%{pypi_name}.
 
 
-%package -n python2-%{pypi_name}
+%package -n %{?scl_prefix}python2-%{pypi_name}
 Summary:        %{summary}
-%{?python_provide:%python_provide python2-%{pypi_name}}
-Requires:       python-futures
-Requires:       python-scales
-Requires:       python-blist
+%{!?scl:%{?python_provide:%python_provide python2-%{pypi_name}}}
+Requires:       %{?scl_prefix}python-futures
+Requires:       %{?scl_prefix}python-scales
+Requires:       %{?scl_prefix}python-blist
 
-Provides:       %{name} = %{version}-%{release}
-Obsoletes:      %{name} < 3.7.1-5
+Provides:       %{?scl_prefix}%{name} = %{version}-%{release}
+Obsoletes:      %{?scl_prefix}%{name} < 3.7.1-5
 
-%description -n python2-%{pypi_name}
+%description -n %{?scl_prefix}python2-%{pypi_name}
 %{desc}
 
 %if 0%{?with_python3}
-%package -n python%{python3_pkgversion}-%{pypi_name}
+%package -n %{?scl_prefix}python%{python3_pkgversion}-%{pypi_name}
 Summary:        %{summary}
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
-Requires:       python%{python3_pkgversion}-scales
-Requires:       python%{python3_pkgversion}-blist
+%{!?scl:%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}}
+Requires:       %{?scl_prefix}python%{python3_pkgversion}-scales
+Requires:       %{?scl_prefix}python%{python3_pkgversion}-blist
 
-%description -n python%{python3_pkgversion}-%{pypi_name}
+%description -n %{?scl_prefix}python%{python3_pkgversion}-%{pypi_name}
 %{desc}
 %endif
 
@@ -103,6 +109,7 @@ Requires:       python%{python3_pkgversion}-blist
 sed -i 's/\([cC]ython.*\),<0.25/\1/g' test-requirements.txt setup.py
 
 %build
+%{?scl:scl enable %{scl} - << "EOF"}
 # Build with Cython only in Fedora
 %if 0%{?fedora}
 %py2_build
@@ -113,12 +120,14 @@ sed -i 's/\([cC]ython.*\),<0.25/\1/g' test-requirements.txt setup.py
 %if 0%{?with_python3}
 %py3_build
 %endif
+%{?scl:EOF}
 
 %install
+%{?scl:scl enable %{scl} - << "EOF"}
 %if 0%{?fedora}
 %py2_install
 %else
-%py2_install -- --no-cython
+%py2_install -- --no-cython --prefix %{?_prefix}
 %endif
 %if 0%{?with_python3}
 %py3_install
@@ -135,6 +144,8 @@ chmod 0755 %{buildroot}%{python2_sitearch}/%{modname}/{io/,}*.so
 chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %endif
 %endif
+%{?scl:EOF}
+
 
 %check
 # Just running the unit tests. Integration tests need ccm and cassandra
@@ -169,7 +180,7 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %doc docs/
 %license LICENSE
 
-%files -n python2-%{pypi_name}
+%files -n %{?scl_prefix}python2-%{pypi_name}
 %{python2_sitearch}/%{modname}/
 %exclude %{python2_sitearch}/%{modname}/*.c
 %exclude %{python2_sitearch}/%{modname}/*/*.c
@@ -178,7 +189,7 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %license LICENSE
 
 %if 0%{?with_python3}
-%files -n python%{python3_pkgversion}-%{pypi_name}
+%files -n %{?scl_prefix}python%{python3_pkgversion}-%{pypi_name}
 %{python3_sitearch}/%{modname}/
 %exclude %{python3_sitearch}/%{modname}/*.c
 %exclude %{python3_sitearch}/%{modname}/*/*.c
@@ -188,6 +199,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %endif
 
 %changelog
+* Wed Oct 04 2017 Augusto Mecking Caringi <acaringi@redhat.com> - 3.11.0-3
+- scl conversion
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.11.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
