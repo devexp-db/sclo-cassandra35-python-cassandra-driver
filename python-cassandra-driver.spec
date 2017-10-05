@@ -25,7 +25,7 @@ Cassandra's binary protocol and Cassandra Query Language v3.\
 
 Name:           %{?scl_prefix}python-%{pypi_name}
 Version:        3.11.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Python driver for Apache Cassandra
 Group:          Development/Libraries
 License:        ASL 2.0
@@ -82,9 +82,9 @@ This package provides the documentation for python-%{pypi_name}.
 %package -n %{?scl_prefix}python2-%{pypi_name}
 Summary:        %{summary}
 %{!?scl:%{?python_provide:%python_provide python2-%{pypi_name}}}
-Requires:       %{?scl_prefix}python-futures
-Requires:       %{?scl_prefix}python-scales
-Requires:       %{?scl_prefix}python-blist
+Requires:       %{?scl_prefix}python2-futures
+Requires:       %{?scl_prefix}python2-scales
+Requires:       %{?scl_prefix}python2-blist
 
 Provides:       %{?scl_prefix}%{name} = %{version}-%{release}
 Obsoletes:      %{?scl_prefix}%{name} < 3.7.1-5
@@ -199,6 +199,9 @@ chmod 0755 %{buildroot}%{python3_sitearch}/%{modname}/{io/,}*.so
 %endif
 
 %changelog
+* Thu Oct 05 2017 Augusto Mecking Caringi <acaringi@redhat.com> - 3.11.0-4
+- fixed runtime dependencies
+
 * Wed Oct 04 2017 Augusto Mecking Caringi <acaringi@redhat.com> - 3.11.0-3
 - scl conversion
 
